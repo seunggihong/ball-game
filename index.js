@@ -1,6 +1,8 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const score = document.querySelector("#score");
+const modelEl = document.querySelector("#modelEl");
+const endScore = document.querySelector("#endScore");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -168,6 +170,8 @@ function animate() {
     // end game
     if (dist - enemy.radius - player.radius < 0.1) {
       cancelAnimationFrame(animationId);
+      endScore.innerHTML = scoreAdd;
+      modelEl.style.display = "block";
     }
     for (
       let projectilesIndex = projectiles.length - 1;
