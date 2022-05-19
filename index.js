@@ -137,16 +137,17 @@ function animate() {
   ctx.fillStyle = "rgba(0,0,0,0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   player.darw();
-  particles.forEach((particle, index) => {
+  for (let index = particles.length - 1; index >= 0; index--) {
+    const particle = particles[index];
     if (particle.alpha <= 0) {
       particles.splice(index, 1);
     } else {
       particle.update();
     }
-  });
-  projectiles.forEach((projectile, index) => {
+  }
+  for (let index = projectiles.length - 1; index >= 0; index--) {
+    const projectile = projectiles[index];
     projectile.update();
-
     // remove from edges of screen
     if (
       projectile.x + projectile.radius < 0 ||
@@ -154,19 +155,26 @@ function animate() {
       projectile.y + projectile.radius < 0 ||
       projectile.y - projectile.radius > canvas.height
     ) {
-      setTimeout(() => {
-        projectiles.splice(index, 1);
-      }, 0);
+      projectiles.splice(index, 1);
     }
-  });
-  enemies.forEach((enemy, index) => {
+  }
+
+  for (let index = enemies.length - 1; index >= 0; index--) {
+    const enemy = enemies[index];
+
     enemy.update();
+
     const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
     // end game
     if (dist - enemy.radius - player.radius < 0.1) {
       cancelAnimationFrame(animationId);
     }
-    projectiles.forEach((projectile, projectilesIndex) => {
+    for (
+      let projectilesIndex = projectiles.length - 1;
+      projectilesIndex >= 0;
+      projectilesIndex--
+    ) {
+      const projectile = projectiles[projectilesIndex];
       const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
       // when projectile touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
@@ -193,21 +201,18 @@ function animate() {
           gsap.to(enemy, {
             radius: enemy.radius - 10,
           });
-          setTimeout(() => {
-            projectiles.splice(projectilesIndex, 1);
-          }, 0);
+
+          projectiles.splice(projectilesIndex, 1);
         } else {
           // remove enemy if they are too small
           scoreAdd += 150;
           score.innerHTML = scoreAdd;
-          setTimeout(() => {
-            enemies.splice(index, 1);
-            projectiles.splice(projectilesIndex, 1);
-          }, 0);
+          enemies.splice(index, 1);
+          projectiles.splice(projectilesIndex, 1);
         }
       }
-    });
-  });
+    }
+  }
 }
 
 window.addEventListener("click", (e) => {
