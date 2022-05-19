@@ -1,5 +1,6 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+const score = document.querySelector("#score");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -130,6 +131,7 @@ function spawnEnemies() {
   }, 1000);
 }
 let animationId;
+let scoreAdd = 0;
 function animate() {
   animationId = requestAnimationFrame(animate);
   ctx.fillStyle = "rgba(0,0,0,0.1)";
@@ -168,22 +170,26 @@ function animate() {
       const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
       // when projectile touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
+        // create explosions
+        for (let i = 0; i < enemy.radius * 2; i++) {
+          particles.push(
+            new Particle(
+              projectile.x,
+              projectile.y,
+              Math.random() * 2,
+              enemy.color,
+              {
+                x: (Math.random() - 0.5) * (Math.random() * 8),
+                y: (Math.random() - 0.5) * (Math.random() * 6),
+              }
+            )
+          );
+        }
+        // this is where we shrink our enemy
         if (enemy.radius - 10 > 5) {
-          // create explosions
-          for (let i = 0; i < enemy.radius * 2; i++) {
-            particles.push(
-              new Particle(
-                projectile.x,
-                projectile.y,
-                Math.random() * 2,
-                enemy.color,
-                {
-                  x: (Math.random() - 0.5) * (Math.random() * 8),
-                  y: (Math.random() - 0.5) * (Math.random() * 6),
-                }
-              )
-            );
-          }
+          console.log(scoreAdd);
+          scoreAdd += 100;
+          score.innerHTML = scoreAdd;
           gsap.to(enemy, {
             radius: enemy.radius - 10,
           });
@@ -191,6 +197,9 @@ function animate() {
             projectiles.splice(projectilesIndex, 1);
           }, 0);
         } else {
+          // remove enemy if they are too small
+          scoreAdd += 150;
+          score.innerHTML = scoreAdd;
           setTimeout(() => {
             enemies.splice(index, 1);
             projectiles.splice(projectilesIndex, 1);
@@ -204,8 +213,8 @@ function animate() {
 window.addEventListener("click", (e) => {
   const angle = Math.atan2(e.clientY - y, e.clientX - x);
   const velocity = {
-    x: Math.cos(angle) * 4,
-    y: Math.sin(angle) * 4,
+    x: Math.cos(angle) * 6,
+    y: Math.sin(angle) * 6,
   };
   projectiles.push(new Projectile(x, y, 5, "white", velocity));
 });
