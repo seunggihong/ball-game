@@ -8,6 +8,7 @@
     <style>
       body {
         margin: 0;
+        background-color: black;
       }
     </style>
   </head>
@@ -61,6 +62,40 @@
         "
       >
         Restart Game
+      </button>
+    </div>
+
+    <div
+      id="startModelEl"
+      style="
+        position: absolute;
+        background-color: white;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        left: 50%;
+        padding: 16px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        border-radius: 25px;
+      "
+    >
+      <h1 style="font-size: 24px; margin-bottom: 0; margin-top: 6px">
+        Base Defense Game
+      </h1>
+      <button
+        id="startBtn"
+        style="
+          margin-top: 12px;
+          background-color: blue;
+          border: none;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 25px;
+          cursor: pointer;
+        "
+      >
+        Start
       </button>
     </div>
     <canvas></canvas>

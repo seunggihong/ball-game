@@ -6,6 +6,8 @@ const modelEl = document.querySelector("#modelEl");
 const endScore = document.querySelector("#endScore");
 const btnEl = document.querySelector("#btnEl");
 const gameLv = document.querySelector("#gameLv");
+const startModelEl = document.querySelector("#startModelEl");
+const startBtn = document.querySelector("#startBtn");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -126,6 +128,8 @@ function init() {
   scoreAdd = 0;
   gameLevel = 1;
   spawnEnemieRadius = 20;
+  score.innerHTML = scoreAdd;
+  gameLv.innerHTML = gameLevel;
 }
 
 function spawnEnemies() {
@@ -188,8 +192,17 @@ function animate() {
     if (dist - enemy.radius - player.radius < 0.1) {
       cancelAnimationFrame(animationId);
       clearInterval(intervalId);
+
       endScore.innerHTML = scoreAdd;
       modelEl.style.display = "block";
+      gsap.fromTo(
+        "#modelEl",
+        {
+          scale: 0.8,
+          opacity: 0,
+        },
+        { scale: 1, opacity: 1, ease: "expo" }
+      );
     }
     for (
       let projectilesIndex = projectiles.length - 1;
@@ -253,14 +266,34 @@ window.addEventListener("click", (e) => {
   projectiles.push(new Projectile(x, y, 5, "white", velocity));
 });
 
+// restart btn event listener
 btnEl.addEventListener("click", () => {
   init();
-  modelEl.style.display = "none";
-  score.innerHTML = scoreAdd;
-  gameLv.innerHTML = gameLevel;
   spawnEnemies();
   animate();
+  gsap.to("#modelEl", {
+    opacity: 0,
+    scale: 0.8,
+    duration: 0.3,
+    ease: "expo.in",
+    onComplete: () => {
+      modelEl.style.display = "none";
+    },
+  });
 });
 
-animate();
-spawnEnemies();
+// start btn event listener
+startBtn.addEventListener("click", () => {
+  init();
+  animate();
+  spawnEnemies();
+  gsap.to("#startModelEl", {
+    opacity: 0,
+    scale: 0.8,
+    duration: 0.3,
+    ease: "expo.in",
+    onComplete: () => {
+      startModelEl.style.display = "none";
+    },
+  });
+});
