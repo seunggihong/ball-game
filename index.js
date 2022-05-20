@@ -5,6 +5,7 @@ const score = document.querySelector("#score");
 const modelEl = document.querySelector("#modelEl");
 const endScore = document.querySelector("#endScore");
 const btnEl = document.querySelector("#btnEl");
+const gameLv = document.querySelector("#gameLv");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -113,6 +114,8 @@ let particles = [];
 let animationId;
 let intervalId;
 let scoreAdd = 0;
+let gameLevel = 1;
+let spawnEnemieRadius = 20;
 
 function init() {
   player = new Player(x, y, 10, "white");
@@ -121,12 +124,13 @@ function init() {
   particles = [];
   animationId;
   scoreAdd = 0;
+  gameLevel = 1;
+  spawnEnemieRadius = 20;
 }
 
 function spawnEnemies() {
   intervalId = setInterval(() => {
-    const radius = Math.random() * 30 + 20;
-
+    const radius = Math.random() * 30 + spawnEnemieRadius;
     let x, y;
     if (Math.random() < 0.5) {
       x = Math.random() > 0.5 ? 0 - radius : canvas.width + radius;
@@ -144,7 +148,7 @@ function spawnEnemies() {
     };
 
     enemies.push(new Enemy(x, y, radius, color, velocity));
-  }, 1000);
+  }, 1500);
 }
 
 function animate() {
@@ -194,6 +198,14 @@ function animate() {
     ) {
       const projectile = projectiles[projectilesIndex];
       const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
+      // game level contrall
+      if (scoreAdd == 1000 * gameLevel) {
+        if (gameLevel != 20) {
+          gameLevel += 1;
+          gameLv.innerHTML = gameLevel;
+          spawnEnemieRadius -= 1;
+        }
+      }
       // when projectile touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
         // create explosions
@@ -213,7 +225,6 @@ function animate() {
         }
         // this is where we shrink our enemy
         if (enemy.radius - 10 > 5) {
-          console.log(scoreAdd);
           scoreAdd += 100;
           score.innerHTML = scoreAdd;
           gsap.to(enemy, {
@@ -223,7 +234,7 @@ function animate() {
           projectiles.splice(projectilesIndex, 1);
         } else {
           // remove enemy if they are too small
-          scoreAdd += 150;
+          scoreAdd += 100;
           score.innerHTML = scoreAdd;
           enemies.splice(index, 1);
           projectiles.splice(projectilesIndex, 1);
@@ -236,8 +247,8 @@ function animate() {
 window.addEventListener("click", (e) => {
   const angle = Math.atan2(e.clientY - y, e.clientX - x);
   const velocity = {
-    x: Math.cos(angle) * 6,
-    y: Math.sin(angle) * 6,
+    x: Math.cos(angle) * 8,
+    y: Math.sin(angle) * 8,
   };
   projectiles.push(new Projectile(x, y, 5, "white", velocity));
 });
@@ -245,6 +256,8 @@ window.addEventListener("click", (e) => {
 btnEl.addEventListener("click", () => {
   init();
   modelEl.style.display = "none";
+  score.innerHTML = scoreAdd;
+  gameLv.innerHTML = gameLevel;
   spawnEnemies();
   animate();
 });
