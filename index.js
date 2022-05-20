@@ -1,8 +1,10 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+
 const score = document.querySelector("#score");
 const modelEl = document.querySelector("#modelEl");
 const endScore = document.querySelector("#endScore");
+const btnEl = document.querySelector("#btnEl");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -104,13 +106,25 @@ class Particle {
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
-const player = new Player(x, y, 10, "white");
-const projectiles = [];
-const enemies = [];
-const particles = [];
+let player = new Player(x, y, 10, "white");
+let projectiles = [];
+let enemies = [];
+let particles = [];
+let animationId;
+let intervalId;
+let scoreAdd = 0;
+
+function init() {
+  player = new Player(x, y, 10, "white");
+  projectiles = [];
+  enemies = [];
+  particles = [];
+  animationId;
+  scoreAdd = 0;
+}
 
 function spawnEnemies() {
-  setInterval(() => {
+  intervalId = setInterval(() => {
     const radius = Math.random() * 30 + 20;
 
     let x, y;
@@ -132,8 +146,7 @@ function spawnEnemies() {
     enemies.push(new Enemy(x, y, radius, color, velocity));
   }, 1000);
 }
-let animationId;
-let scoreAdd = 0;
+
 function animate() {
   animationId = requestAnimationFrame(animate);
   ctx.fillStyle = "rgba(0,0,0,0.1)";
@@ -170,6 +183,7 @@ function animate() {
     // end game
     if (dist - enemy.radius - player.radius < 0.1) {
       cancelAnimationFrame(animationId);
+      clearInterval(intervalId);
       endScore.innerHTML = scoreAdd;
       modelEl.style.display = "block";
     }
@@ -226,6 +240,13 @@ window.addEventListener("click", (e) => {
     y: Math.sin(angle) * 6,
   };
   projectiles.push(new Projectile(x, y, 5, "white", velocity));
+});
+
+btnEl.addEventListener("click", () => {
+  init();
+  modelEl.style.display = "none";
+  spawnEnemies();
+  animate();
 });
 
 animate();
