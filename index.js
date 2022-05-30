@@ -18,6 +18,10 @@ class Player {
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.velocity = {
+      x: 0,
+      y: 0,
+    };
   }
 
   darw() {
@@ -25,6 +29,33 @@ class Player {
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     ctx.fillStyle = this.color;
     ctx.fill();
+  }
+
+  update() {
+    this.darw();
+
+    const friction = 0.99;
+
+    this.velocity.x *= friction;
+    this.velocity.y *= friction;
+    // collision detection for x axis
+    if (
+      this.x + this.radius + this.velocity.x <= canvas.width &&
+      this.x - this.radius + this.velocity.x >= 0
+    ) {
+      this.x += this.velocity.x;
+    } else {
+      this.velocity.x = 0;
+    }
+    // collision detection for y axis
+    if (
+      this.y + this.radius + this.velocity.y <= canvas.height &&
+      this.y - this.radius + this.velocity.y >= 0
+    ) {
+      this.y += this.velocity.y;
+    } else {
+      this.velocity.y = 0;
+    }
   }
 }
 
@@ -159,7 +190,9 @@ function animate() {
   animationId = requestAnimationFrame(animate);
   ctx.fillStyle = "rgba(0,0,0,0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  player.darw();
+
+  player.update();
+
   for (let index = particles.length - 1; index >= 0; index--) {
     const particle = particles[index];
     if (particle.alpha <= 0) {
@@ -258,12 +291,12 @@ function animate() {
 }
 
 window.addEventListener("click", (e) => {
-  const angle = Math.atan2(e.clientY - y, e.clientX - x);
+  const angle = Math.atan2(e.clientY - player.y, e.clientX - player.x);
   const velocity = {
     x: Math.cos(angle) * 8,
     y: Math.sin(angle) * 8,
   };
-  projectiles.push(new Projectile(x, y, 5, "white", velocity));
+  projectiles.push(new Projectile(player.x, player.y, 5, "white", velocity));
 });
 
 // restart btn event listener
@@ -296,4 +329,21 @@ startBtn.addEventListener("click", () => {
       startModelEl.style.display = "none";
     },
   });
+});
+
+window.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "ArrowRight":
+      player.velocity.x += 1;
+      break;
+    case "ArrowUp":
+      player.velocity.y -= 1;
+      break;
+    case "ArrowLeft":
+      player.velocity.x -= 1;
+      break;
+    case "ArrowDown":
+      player.velocity.y += 1;
+      break;
+  }
 });
